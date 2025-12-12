@@ -2,7 +2,10 @@ package ru.practicum.ewm.request.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
+
+
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
@@ -24,9 +27,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+
 @Slf4j
 public class RequestPrivateService {
 
@@ -136,6 +142,9 @@ public class RequestPrivateService {
         long confirmedCount = requestRepository.countConfirmedRequestsByEventId(eventId);
         long limit = event.getParticipantLimit();
 
+
+        List<ParticipationRequest> requestList = new ArrayList<>();
+
         for (ParticipationRequest request : requests) {
             if (!request.getStatus().equals(RequestStatus.PENDING)) {
                 throw new ConflictException("Статус можно изменить только у заявок в ожидании");
@@ -154,9 +163,9 @@ public class RequestPrivateService {
             } else {
                 throw new IllegalArgumentException("Неверный статус: " + dto.getStatus());
             }
-
-            requestRepository.save(request);
+            requestList.add(request);
         }
+
 
         // Если лимит достигнут, отклоняем все оставшиеся PENDING заявки
         if (limit != 0 && confirmedCount >= limit) {
@@ -168,16 +177,17 @@ public class RequestPrivateService {
             for (ParticipationRequest pending : pendingRequests) {
                 pending.setStatus(RequestStatus.REJECTED);
                 rejected.add(mapper.toParticipationRequestResponse(pending));
-                requestRepository.save(pending);
+                requestList.add(pending);
             }
         }
-
+        requestRepository.saveAll(requestList);
         EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
         result.setConfirmedRequests(confirmed);
         result.setRejectedRequests(rejected);
 
         return result;
     }
+
 
 }
 
