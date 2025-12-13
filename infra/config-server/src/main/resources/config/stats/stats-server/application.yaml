@@ -1,0 +1,52 @@
+# порт сервиса 9090
+server:
+  port: 0
+
+# Database configuration (5432)
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6541/stats?currentSchema=public
+    username: stats
+    password: stats
+
+    # HikariCP (пул соединений)
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idl: =2
+
+
+# Конфигурация JPA/Hibernate
+    jpa:
+      hibernate:
+        ddlAuto: validate
+        show_sql: true
+        properties:
+          hibernate:
+            dialect: org.hibernate.dialect.PostgreSQLDialect
+            format_sql: true
+
+   # Инициализация БД
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+# Формат дат (Jackson)
+  jackson:
+  serialization:
+    write-dates-as-timestamps: false
+  format:
+    datetime: "yyyy-MM-dd'T'HH:mm:ss"
+  time-zone: UTC
+
+    # Логирование
+logging:
+    level:
+      org:
+        springframework:
+          orm.jpa: DEBUG
+          transaction: DEBUG
+        hibernate:
+          SQL: DEBUG

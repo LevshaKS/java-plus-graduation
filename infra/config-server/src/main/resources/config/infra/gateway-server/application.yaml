@@ -1,0 +1,33 @@
+#server:
+#  port: 8080
+# порт сервиса
+
+
+spring:
+ # main.web-application-type: reactive
+  cloud:
+    gateway:
+      discovery.locator.enabled: true
+
+      routes:
+        - id: main-service_admin_route
+          uri: lb://main-service
+          predicates:
+            - Path=/admin/**
+
+        - id: main-service_user_route
+          uri: lb://main-service
+          predicates:
+            - Path=/users/{userId}/**
+
+        - id: main-service_public_route
+          uri: lb://main-service
+          predicates:
+            - Path=/{segment:(?:categories|comments|compilations|events)}/**
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
