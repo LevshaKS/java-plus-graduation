@@ -1,5 +1,6 @@
 package ru.practicum.interactionapi.feignClient;
 
+import feign.FeignException;
 import org.springframework.cloud.openfeign.FeignClient;
 import jakarta.validation.Valid;
 
@@ -19,7 +20,7 @@ import java.util.List;
 public interface StatsFeignClient {
 
     @PostMapping("/hit")
-    void saveHit(@Valid @RequestBody EndpointHitDto hitDto);//throws FeignException;
+    void saveHit(@Valid @RequestBody EndpointHitDto hitDto)  throws FeignException;
 
 
     @GetMapping("/stats")

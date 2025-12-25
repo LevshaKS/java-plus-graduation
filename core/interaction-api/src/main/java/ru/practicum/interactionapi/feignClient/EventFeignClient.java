@@ -1,6 +1,7 @@
 package ru.practicum.interactionapi.feignClient;
 
 
+import feign.FeignException;
 import org.springframework.cloud.openfeign.FeignClient;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,7 @@ import ru.practicum.interactionapi.dto.event.EventFullDto;
 public interface EventFeignClient {
 
     @GetMapping("/{eventId}")
-    EventFullDto eventById(@PathVariable Long eventId);//throws FeignException;
+    EventFullDto eventById(@PathVariable Long eventId) throws FeignException;
 
 
 }

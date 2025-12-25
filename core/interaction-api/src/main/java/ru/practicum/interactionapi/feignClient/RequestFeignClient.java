@@ -1,6 +1,7 @@
 package ru.practicum.interactionapi.feignClient;
 
 
+import feign.FeignException;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateRequest;
@@ -14,24 +15,24 @@ public interface RequestFeignClient {
 
 
     @GetMapping("/{eventId}")
-    Long countConfirmedRequestsByEventId(@PathVariable Long eventId);// throws FeignException;
+    Long countConfirmedRequestsByEventId(@PathVariable Long eventId) throws FeignException;
 
 
     @GetMapping("/request/{eventIds}")
-    List<Object[]> countConfirmedRequestsByEventIds(@PathVariable List<Long> eventIds);// throws FeignException;
+    List<Object[]> countConfirmedRequestsByEventIds(@PathVariable List<Long> eventIds) throws FeignException;
 
 
     @GetMapping("/{userId}/{eventId}/requests")
     List<ParticipationRequestDto> getEventParticipants(
             @PathVariable Long userId,
-            @PathVariable Long eventId);//throws FeignException;
+            @PathVariable Long eventId) throws FeignException;
 
 
     @PutMapping("/{userId}/{eventId}/request")
     EventRequestStatusUpdateResult changeRequestStatus(
             @PathVariable Long userId,
             @PathVariable Long eventId,
-            @RequestBody EventRequestStatusUpdateRequest dto);//throws FeignException;
+            @RequestBody EventRequestStatusUpdateRequest dto) throws FeignException;
 
 
 }
