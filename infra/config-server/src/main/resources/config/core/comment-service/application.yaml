@@ -1,0 +1,44 @@
+# порт сервиса
+server:
+  port: 0
+
+# Database configuration
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6543/comments
+    username: postgres
+    password: postgres
+
+  # JPA configuration
+  jpa:
+    hibernate:
+      ddlAuto: none
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+          format_sql: true
+
+  sql:
+    init:
+      mode: always
+
+  # Logging
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa: INFO
+          jpa.JpaTransactionManager: DEBUG
+
+        transaction: INFO
+        transaction.interceptor: TRACE
+
+      hibernate:
+        SQL: DEBUG
+        type.:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+

@@ -1,7 +1,4 @@
 services:
-  #stats-server:
-  # ports:
-  #   - "9090:9090"
 
   stats-db:
     image: postgres:16.1
@@ -13,16 +10,47 @@ services:
       - POSTGRES_USER=stats
       - POSTGRES_PASSWORD=stats
 
-  # ewm-service:
-  #   ports:
-  #     - "8080:8080"
-
-  ewm-db:
+  user-db:
     image: postgres:16.1
-    container_name: ewm-db
+    container_name: user-db
     ports:
       - "6542:5432"
     environment:
-      - POSTGRES_DB=ewm
-      - POSTGRES_USER=ewm
-      - POSTGRES_PASSWORD=ewm
+      - POSTGRES_DB=user
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=user
+
+  db-postgres:
+    image: postgres:16.1
+    container_name: db-postgres
+    hostname: postgres
+    ports:
+      - "6543:5432"
+    environment:
+      - POSTGRES_DB=events
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  postgres-ewm-init:
+    image: postgres:16.1
+    container_name: postgres-init
+    depends_on:
+      db-postgres:
+        condition: service_healthy
+
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -e
+        psql postgresql://postgres:postgres@postgres:5432 -v ON_ERROR_STOP=1 <<-EOSQL
+        
+        create database locations;
+        create database requests;
+        create database comments;
+        EOSQL

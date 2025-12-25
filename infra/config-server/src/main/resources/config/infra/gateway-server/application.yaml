@@ -9,21 +9,29 @@ spring:
     gateway:
       discovery.locator.enabled: true
 
+
+
+
       routes:
-        - id: main-service_admin_route
-          uri: lb://main-service
+        - id: event-service_route
+          uri: lb://event-service
           predicates:
-            - Path=/admin/**
+            - Path=/admin/categories/**,/categories/**,/admin/compilations/**,/compilations/**,/admin/events/**,/users/{userId}/events/**,/events/**
 
-        - id: main-service_user_route
-          uri: lb://main-service
+        - id: user-service_route
+          uri: lb://user-service
           predicates:
-            - Path=/users/{userId}/**
+            - Path=/admin/users/**
 
-        - id: main-service_public_route
-          uri: lb://main-service
+        - id: comment_service_route
+          uri: lb://comment-service
           predicates:
-            - Path=/{segment:(?:categories|comments|compilations|events)}/**
+            - Path=/admin/comments/**,/users/{userId}/comments/**,/comments/**
+
+        - id: request_service_route
+          uri: lb://request-service
+          predicates:
+            - Path=/users/{userId}/requests/**
 
 
 management:

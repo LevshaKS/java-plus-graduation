@@ -3,7 +3,8 @@ package ru.practicum.service.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.practicum.dto.ViewStats;
+
+import ru.practicum.interactionapi.dto.stats.ViewStats;
 import ru.practicum.service.model.EndpointHit;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> {
 
-    @Query("SELECT new ru.practicum.dto.ViewStats(e.app, e.uri, COUNT(e)) " +
+    @Query("SELECT new ru.practicum.interactionapi.dto.stats.ViewStats(e.app, e.uri, COUNT(e)) " +
             "FROM EndpointHit e " +
             "WHERE e.timestamp BETWEEN :start AND :end " +
             "AND (:uris IS NULL OR e.uri IN :uris) " +
@@ -21,7 +22,7 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
                               @Param("end") LocalDateTime end,
                               @Param("uris") List<String> uris);
 
-    @Query("SELECT new ru.practicum.dto.ViewStats(e.app, e.uri, COUNT(DISTINCT e.ip)) " +
+    @Query("SELECT new ru.practicum.interactionapi.dto.stats.ViewStats(e.app, e.uri, COUNT(DISTINCT e.ip)) " +
             "FROM EndpointHit e " +
             "WHERE e.timestamp BETWEEN :start AND :end " +
             "AND (:uris IS NULL OR e.uri IN :uris) " +
