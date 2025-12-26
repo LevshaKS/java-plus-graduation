@@ -1,4 +1,4 @@
-package ru.practicum.commentservice.exception;
+package ru.practicum.eventservice.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;

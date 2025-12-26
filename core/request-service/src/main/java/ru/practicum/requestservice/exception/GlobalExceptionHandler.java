@@ -127,6 +127,5 @@ public class GlobalExceptionHandler {
             String reason,
             String message,
             String timestamp
-    ) {
-    }
+    ) {}
 }
