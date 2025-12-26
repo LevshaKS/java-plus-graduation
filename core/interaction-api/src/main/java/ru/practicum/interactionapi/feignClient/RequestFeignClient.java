@@ -15,21 +15,21 @@ import java.util.List;
 @FeignClient(name = "request-service", path = "/internal/requests")
 public interface RequestFeignClient {
 
-    @CircuitBreaker(name = "defaultBreaker", fallbackMethod = "eventByIdFallback")
+    @CircuitBreaker(name = "defaultBreaker", fallbackMethod = "countConfirmedRequestsByEventIdFallback")
     @GetMapping("/{eventId}")
     Long countConfirmedRequestsByEventId(@PathVariable Long eventId) throws FeignException;
 
-    @CircuitBreaker(name = "defaultBreaker", fallbackMethod = "eventByIdFallback")
+    @CircuitBreaker(name = "defaultBreaker", fallbackMethod = "countConfirmedRequestsByEventIdsFallback")
     @GetMapping("/request/{eventIds}")
     List<Object[]> countConfirmedRequestsByEventIds(@PathVariable List<Long> eventIds) throws FeignException;
 
-    @CircuitBreaker(name = "defaultBreaker", fallbackMethod = "eventByIdFallback")
+    @CircuitBreaker(name = "defaultBreaker", fallbackMethod = "getEventParticipantsFallback")
     @GetMapping("/{userId}/{eventId}/requests")
     List<ParticipationRequestDto> getEventParticipants(
             @PathVariable Long userId,
             @PathVariable Long eventId) throws FeignException;
 
-    @CircuitBreaker(name = "defaultBreaker", fallbackMethod = "eventByIdFallback")
+
     @PutMapping("/{userId}/{eventId}/request")
     EventRequestStatusUpdateResult changeRequestStatus(
             @PathVariable Long userId,
@@ -58,13 +58,6 @@ public interface RequestFeignClient {
 
 
 
-    @PutMapping("/{userId}/{eventId}/request")
-    default EventRequestStatusUpdateResult changeRequestStatusFallback(
-            @PathVariable Long userId,
-            @PathVariable Long eventId,
-            @RequestBody EventRequestStatusUpdateRequest dto, Exception throwable){
-        return new EventRequestStatusUpdateResult();
-        }
 
 
 }

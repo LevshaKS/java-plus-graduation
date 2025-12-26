@@ -73,12 +73,12 @@ public class RequestPrivateService {
         if (user == null) {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
-        //   .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найден"));
+
         EventFullDto event = eventFeignClient.eventById(eventId);
         if (event == null) {
             throw new NotFoundException("Событие с id=" + eventId + " не найдено");
         }
-        //    .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
+
 
         if (event.getInitiator().equals(userId)) {
             throw new ConflictException("Нельзя добавить запрос на участие в своём событии");
