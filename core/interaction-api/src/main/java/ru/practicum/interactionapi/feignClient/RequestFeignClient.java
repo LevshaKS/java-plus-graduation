@@ -29,7 +29,7 @@ public interface RequestFeignClient {
             @PathVariable Long userId,
             @PathVariable Long eventId) throws FeignException;
 
-    @CircuitBreaker(name = "defaultBreaker", fallbackMethod = "changeRequestStatusFallback")
+
     @PutMapping("/{userId}/{eventId}/request")
     EventRequestStatusUpdateResult changeRequestStatus(
             @PathVariable Long userId,
@@ -37,34 +37,23 @@ public interface RequestFeignClient {
             @RequestBody EventRequestStatusUpdateRequest dto);
 
     @GetMapping("/{eventId}")
-   default   Long countConfirmedRequestsByEventIdFallback(@PathVariable Long eventId, Exception throwable) {
+    default Long countConfirmedRequestsByEventIdFallback(@PathVariable Long eventId, Exception throwable) {
         return 0L;
     }
 
 
-
     @GetMapping("/request/{eventIds}")
-    default List<Object[]> countConfirmedRequestsByEventIdsFallback(@PathVariable List<Long> eventIds, Exception throwable){
-        return  new ArrayList<>();
-        }
+    default List<Object[]> countConfirmedRequestsByEventIdsFallback(@PathVariable List<Long> eventIds, Exception throwable) {
+        return new ArrayList<>();
+    }
 
 
     @GetMapping("/{userId}/{eventId}/requests")
     default List<ParticipationRequestDto> getEventParticipantsFallback(
             @PathVariable Long userId,
             @PathVariable Long eventId, Exception throwable) {
-        return  new ArrayList<>();
+        return new ArrayList<>();
     }
-
-    @PutMapping("/{userId}/{eventId}/request")
-    default EventRequestStatusUpdateResult changeRequestStatusFallback(
-            @PathVariable Long userId,
-            @PathVariable Long eventId,
-            @RequestBody EventRequestStatusUpdateRequest dto){
-        return  new EventRequestStatusUpdateResult();
-    }
-
-
 
 
 }

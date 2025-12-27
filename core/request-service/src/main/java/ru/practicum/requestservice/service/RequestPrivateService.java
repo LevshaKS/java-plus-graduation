@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.interactionapi.dto.event.EventFullDto;
 import ru.practicum.interactionapi.dto.user.UserDto;
 import ru.practicum.interactionapi.enums.EventState;
+import ru.practicum.interactionapi.enums.ExceptionStatus;
 import ru.practicum.interactionapi.exception.ConflictException;
 import ru.practicum.interactionapi.exception.NotFoundException;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateRequest;
@@ -175,12 +176,26 @@ public class RequestPrivateService {
 
         for (ParticipationRequest request : requests) {
             if (!request.getStatus().equals(RequestStatus.PENDING)) {
-                throw new ConflictException("Статус можно изменить только у заявок в ожидании");
+
+
+                return EventRequestStatusUpdateResult.builder().
+                        confirmedRequests(confirmed).
+                        rejectedRequests(rejected).
+                        exceptionStatus(ExceptionStatus.CONFLICT_EXCEPTION_STATUS)
+                        .build();
+
+                //    throw new ConflictException("Статус можно изменить только у заявок в ожидании");
             }
 
             if ("CONFIRMED".equalsIgnoreCase(dto.getStatus())) {
                 if (limit != 0 && confirmedCount >= limit) {
-                    throw new ConflictException("Достигнут лимит одобренных заявок");
+
+                    return EventRequestStatusUpdateResult.builder().
+                            confirmedRequests(confirmed).
+                            rejectedRequests(rejected).
+                            exceptionStatus(ExceptionStatus.CONFLICT_EXCEPTION_LIMIT)
+                            .build();
+                    //      throw new ConflictException("Достигнут лимит одобренных заявок");
                 }
                 request.setStatus(RequestStatus.CONFIRMED);
                 confirmedCount++;
@@ -189,7 +204,12 @@ public class RequestPrivateService {
                 request.setStatus(RequestStatus.REJECTED);
                 rejected.add(mapper.toParticipationRequestResponse(request));
             } else {
-                throw new IllegalArgumentException("Неверный статус: " + dto.getStatus());
+                return EventRequestStatusUpdateResult.builder().
+                        confirmedRequests(confirmed).
+                        rejectedRequests(rejected).
+                        exceptionStatus(ExceptionStatus.ILLEGAL_ARGUMENT)
+                        .build();
+                //     throw new IllegalArgumentException("Неверный статус: " + dto.getStatus());
             }
             requestList.add(request);
         }
@@ -209,11 +229,16 @@ public class RequestPrivateService {
             }
         }
         requestRepository.saveAll(requestList);
-        EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
-        result.setConfirmedRequests(confirmed);
-        result.setRejectedRequests(rejected);
+        // EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
+        //  result.setConfirmedRequests(confirmed);
+        //  result.setRejectedRequests(rejected);
+        //   result.setExceptionStatus(ExceptionStatus.NO_ERROR);
 
-        return result;
+        return EventRequestStatusUpdateResult.builder().
+                confirmedRequests(confirmed)
+                .rejectedRequests(rejected)
+                .exceptionStatus(ExceptionStatus.NO_ERROR)
+                .build();
     }
 
 

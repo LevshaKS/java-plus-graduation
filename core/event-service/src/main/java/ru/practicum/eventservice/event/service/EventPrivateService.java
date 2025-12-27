@@ -22,6 +22,7 @@ import ru.practicum.interactionapi.dto.request.ParticipationRequestDto;
 import ru.practicum.interactionapi.dto.user.UserDto;
 import ru.practicum.interactionapi.enums.EventState;
 import ru.practicum.eventservice.event.repository.EventRepository;
+import ru.practicum.interactionapi.enums.ExceptionStatus;
 import ru.practicum.interactionapi.exception.ConflictException;
 import ru.practicum.interactionapi.exception.NotFoundException;
 import ru.practicum.interactionapi.exception.ValidationException;
@@ -83,10 +84,16 @@ public class EventPrivateService {
             log.error("userId отличается от id создателя события");
             throw new ValidationException("Событие должно быть создано текущим пользователем");
         }
-        EventRequestStatusUpdateResult result = requestFeignClient.changeRequestStatus(userId, eventId, dto);
-        System.out.println(result);
 
-        return  result;
+        EventRequestStatusUpdateResult result = requestFeignClient.changeRequestStatus(userId, eventId, dto);
+      if (result.getExceptionStatus()== ExceptionStatus.CONFLICT_EXCEPTION_STATUS) {
+          throw new ConflictException("Статус можно изменить только у заявок в ожидании");
+      } else if (result.getExceptionStatus()== ExceptionStatus.CONFLICT_EXCEPTION_LIMIT) {
+          throw new ConflictException("Достигнут лимит одобренных заявок");
+      } else if (result.getExceptionStatus()== ExceptionStatus.STATS_SERVER_UNAVAILABLE) {
+          throw new IllegalArgumentException("Неверный статус: " + dto.getStatus());
+      } else return  result;
+
     }
 
 
@@ -106,7 +113,7 @@ public class EventPrivateService {
         if (initiator == null) {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
-        //     .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найден"));
+
 
         LocationDto locationDto = locationFeignClient.saveLocation(dto.getLocation());
         Event event = mapper.toEvent(dto,

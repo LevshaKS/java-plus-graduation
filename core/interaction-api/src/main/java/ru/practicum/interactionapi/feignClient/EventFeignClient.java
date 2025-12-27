@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import ru.practicum.interactionapi.dto.event.EventFullDto;
-import ru.practicum.interactionapi.exception.GlobalExceptionHandler;
-import ru.practicum.interactionapi.exception.StatsServerUnavailable;
+
 
 
 @FeignClient(name = "event-service", path = "/internal/events")
