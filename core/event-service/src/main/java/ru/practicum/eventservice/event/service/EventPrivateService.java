@@ -86,7 +86,7 @@ public class EventPrivateService {
         EventRequestStatusUpdateResult result = requestFeignClient.changeRequestStatus(userId, eventId, dto);
         System.out.println(result);
 
-        return new EventRequestStatusUpdateResult();
+        return  result;
     }
 
 

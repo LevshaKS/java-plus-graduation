@@ -20,7 +20,7 @@ public interface UserFeignClient {
     @GetMapping
     List<UserDto> getUsers(@RequestParam(required = false) List<Long> ids,
                            @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                           @RequestParam(defaultValue = "10") @Positive int size) throws FeignException;
+                           @RequestParam(defaultValue = "10") @Positive int size) ;
 
     @DeleteMapping("/{userId}")
     void deleteUser(@PathVariable Long userId) throws FeignException;

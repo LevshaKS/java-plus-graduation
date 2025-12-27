@@ -29,12 +29,12 @@ public interface RequestFeignClient {
             @PathVariable Long userId,
             @PathVariable Long eventId) throws FeignException;
 
-
+    @CircuitBreaker(name = "defaultBreaker", fallbackMethod = "changeRequestStatusFallback")
     @PutMapping("/{userId}/{eventId}/request")
     EventRequestStatusUpdateResult changeRequestStatus(
             @PathVariable Long userId,
             @PathVariable Long eventId,
-            @RequestBody EventRequestStatusUpdateRequest dto) throws FeignException;
+            @RequestBody EventRequestStatusUpdateRequest dto);
 
     @GetMapping("/{eventId}")
    default   Long countConfirmedRequestsByEventIdFallback(@PathVariable Long eventId, Exception throwable) {
@@ -56,6 +56,13 @@ public interface RequestFeignClient {
         return  new ArrayList<>();
     }
 
+    @PutMapping("/{userId}/{eventId}/request")
+    default EventRequestStatusUpdateResult changeRequestStatusFallback(
+            @PathVariable Long userId,
+            @PathVariable Long eventId,
+            @RequestBody EventRequestStatusUpdateRequest dto){
+        return  new EventRequestStatusUpdateResult();
+    }
 
 
 
