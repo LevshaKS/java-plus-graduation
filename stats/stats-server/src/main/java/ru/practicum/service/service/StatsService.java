@@ -3,8 +3,9 @@ package ru.practicum.service.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.dto.EndpointHitDto;
-import ru.practicum.dto.ViewStats;
+
+import ru.practicum.interactionapi.dto.stats.EndpointHitDto;
+import ru.practicum.interactionapi.dto.stats.ViewStats;
 import ru.practicum.service.model.EndpointHit;
 import ru.practicum.service.repository.EndpointHitRepository;
 

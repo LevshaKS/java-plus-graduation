@@ -13,6 +13,13 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>main-service</module>
+
+        <module>user-service</module>
+        <module>event-service</module>
+        <module>comment-service</module>
+        <module>request-service</module>
+        <module>interaction-api</module>
+        <module>location-service</module>
+
     </modules>
 </project>
