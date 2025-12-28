@@ -17,13 +17,13 @@ public class InternalCommentController {
     private final CommentPublicService commentPublicService;
 
     @GetMapping("/{eventId}")
-    Long countByEventId(@PathVariable Long eventId) {
+    public Long countByEventId(@PathVariable Long eventId) {
         return commentPublicService.getCountByEventId(eventId);
     }
 
 
     @GetMapping("/comments/{eventIds}")
-    List<Object[]> countCommentsByEventIds(@PathVariable List<Long> eventIds) {
+    public List<Object[]> countCommentsByEventIds(@PathVariable List<Long> eventIds) {
         return commentPublicService.getCountCommentsByEventIds(eventIds);
     }
 

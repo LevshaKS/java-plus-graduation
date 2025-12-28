@@ -20,20 +20,20 @@ public class InternalRequestController {
     private final RequestPrivateService requestService;
 
     @GetMapping("/{eventId}")
-    Long countConfirmedRequestsByEventId(@PathVariable Long eventId) {
-        log.info("GET /{eventId}", eventId);
+    public Long countConfirmedRequestsByEventId(@PathVariable Long eventId) {
+        log.info("GET /{}", eventId);
         return requestService.countConfirmedRequestsByEventId(eventId);
     }
 
     @GetMapping("/request/{eventIds}")
-    List<Object[]> countConfirmedRequestsByEventIds(@PathVariable List<Long> eventIds) {
-        log.info("GET ", eventIds);
+    public List<Object[]> countConfirmedRequestsByEventIds(@PathVariable List<Long> eventIds) {
+        log.info("GET {}", eventIds);
         return requestService.countConfirmedRequestsByEventIds(eventIds);
     }
 
 
     @GetMapping("/{userId}/{eventId}/requests")
-    List<ParticipationRequestDto> getEventParticipants(
+    public List<ParticipationRequestDto> getEventParticipants(
             @PathVariable Long userId,
             @PathVariable Long eventId) {
         log.info("GET /users/{}/events/{}/requests", userId, eventId);
@@ -41,7 +41,7 @@ public class InternalRequestController {
     }
 
     @PutMapping("/{userId}/{eventId}/request")
-    EventRequestStatusUpdateResult changeRequestStatus(
+    public EventRequestStatusUpdateResult changeRequestStatus(
             @PathVariable Long userId,
             @PathVariable Long eventId,
             @Valid @RequestBody EventRequestStatusUpdateRequest dto) {

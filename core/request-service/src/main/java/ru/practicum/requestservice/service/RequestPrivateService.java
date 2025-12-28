@@ -136,7 +136,7 @@ public class RequestPrivateService {
         if (event == null) {
             throw new NotFoundException("Событие с id=" + eventId + " не найдено");
         }
-        //       .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
+
 
         if (!event.getInitiator().equals(userId)) {
             throw new ConflictException("Пользователь не может просматривать чужие заявки");
@@ -157,7 +157,7 @@ public class RequestPrivateService {
         EventFullDto event = eventFeignClient.eventById(eventId);
         if (event == null) {
             throw new NotFoundException("Событие с id=" + eventId + " не найдено");
-        }  //   .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено"));
+        }
 
         if (!event.getInitiator().equals(userId)) {
             throw new ConflictException("Пользователь не может изменять заявки чужого события");
@@ -184,7 +184,7 @@ public class RequestPrivateService {
                         exceptionStatus(ExceptionStatus.CONFLICT_EXCEPTION_STATUS)
                         .build();
 
-                //    throw new ConflictException("Статус можно изменить только у заявок в ожидании");
+
             }
 
             if ("CONFIRMED".equalsIgnoreCase(dto.getStatus())) {
@@ -195,7 +195,7 @@ public class RequestPrivateService {
                             rejectedRequests(rejected).
                             exceptionStatus(ExceptionStatus.CONFLICT_EXCEPTION_LIMIT)
                             .build();
-                    //      throw new ConflictException("Достигнут лимит одобренных заявок");
+
                 }
                 request.setStatus(RequestStatus.CONFIRMED);
                 confirmedCount++;
@@ -209,7 +209,7 @@ public class RequestPrivateService {
                         rejectedRequests(rejected).
                         exceptionStatus(ExceptionStatus.ILLEGAL_ARGUMENT)
                         .build();
-                //     throw new IllegalArgumentException("Неверный статус: " + dto.getStatus());
+
             }
             requestList.add(request);
         }
@@ -229,10 +229,7 @@ public class RequestPrivateService {
             }
         }
         requestRepository.saveAll(requestList);
-        // EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
-        //  result.setConfirmedRequests(confirmed);
-        //  result.setRejectedRequests(rejected);
-        //   result.setExceptionStatus(ExceptionStatus.NO_ERROR);
+
 
         return EventRequestStatusUpdateResult.builder().
                 confirmedRequests(confirmed)

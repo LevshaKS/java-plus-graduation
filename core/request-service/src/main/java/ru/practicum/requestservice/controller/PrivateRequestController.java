@@ -19,26 +19,6 @@ public class PrivateRequestController {
 
     private final RequestPrivateService requestService;
 
-
-    // ------------------ PARTICIPATION REQUESTS ------------------
-
-//    @GetMapping("/events/{eventId}/requests")
-//    public List<ParticipationRequestDto> getEventParticipants(
-//            @PathVariable Long userId,
-//            @PathVariable Long eventId) {
-//        log.info("GET /users/{}/events/{}/requests", userId, eventId);
-//        return requestService.getRequestsForUserEvent(userId, eventId);
-//    }
-//
-//    @PatchMapping("/events/{eventId}/requests")
-//    public EventRequestStatusUpdateResult changeRequestStatus(
-//            @PathVariable Long userId,
-//            @PathVariable Long eventId,
-//            @Valid @RequestBody EventRequestStatusUpdateRequest dto) {
-//        log.info("PATCH /users/{}/events/{}/requests", userId, eventId);
-//        return requestService.changeRequestStatus(userId, eventId, dto);
-//    }
-
     @GetMapping("/requests")
     public List<ParticipationRequestDto> getUserRequests(@PathVariable Long userId) {
         log.info("GET /users/{}/requests", userId);
