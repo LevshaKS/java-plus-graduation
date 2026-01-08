@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.requestservice.model.ParticipationRequest;
+import ru.practicum.interactionapi.enums.RequestStatus;
 
 import java.util.List;
 
@@ -25,6 +26,9 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     // Проверка существования запроса
     boolean existsByRequesterIdAndEventId(Long requesterId, Long eventId);
+
+    // Проверка участия аользователя в событии
+    boolean findByEventIdAndRequesterIdAndStatus(Long eventId, Long userId, RequestStatus status);
 
     // Подсчет подтвержденных запросов для события
     @Query("SELECT COUNT(pr) FROM ParticipationRequest pr " +

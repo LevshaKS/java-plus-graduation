@@ -3,6 +3,7 @@ package ru.practicum.requestservice.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import ru.practicum.interactionapi.enums.RequestStatus;
 
 import java.time.LocalDateTime;
 

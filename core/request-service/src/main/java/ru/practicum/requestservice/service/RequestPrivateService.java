@@ -22,7 +22,7 @@ import ru.practicum.interactionapi.feignClient.UserFeignClient;
 import ru.practicum.interactionapi.dto.request.ParticipationRequestResponse;
 import ru.practicum.requestservice.mapper.RequestMapper;
 import ru.practicum.requestservice.model.ParticipationRequest;
-import ru.practicum.requestservice.model.RequestStatus;
+import ru.practicum.interactionapi.enums.RequestStatus;
 import ru.practicum.requestservice.repository.ParticipationRequestRepository;
 
 
@@ -146,8 +146,10 @@ public class RequestPrivateService {
                 .stream()
                 .map(mapper::toParticipationRequestDto)
                 .toList();
+    }
 
-
+    public boolean checkByEventIdAndRequesterIdAndStatus(Long eventId, Long userId, RequestStatus status) {
+        return requestRepository.findByEventIdAndRequesterIdAndStatus(eventId, userId, status);
     }
 
     @Transactional

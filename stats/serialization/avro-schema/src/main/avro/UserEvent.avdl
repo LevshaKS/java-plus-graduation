@@ -1,0 +1,23 @@
+@namespace("ru.yandex.practicum.ewm.stats.avro")
+protocol UserEventProtocol {
+
+   enum ActionTypeAvro {
+       VIEW,
+       REGISTER,
+       LIKE
+   }
+
+    record UserActionAvro {
+        long userId;
+        long eventId;
+        ActionTypeAvro actionType;
+        timestamp_ms timestamp;
+    }
+
+    record EventSimilarityAvro {
+        long eventA;
+        long eventB;
+        double score;
+        timestamp_ms timestamp;
+    }
+}

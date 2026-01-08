@@ -56,4 +56,16 @@ public class PublicEventController {
 
         return eventPublicService.getEventById(id, request.getRemoteAddr(), request.getRequestURI());
     }
+
+
+    @GetMapping("/recommendations")
+    public List<EventShortDto> getEventRecommendations(@RequestHeader("X-EWM-USER-ID") Long userId,
+                                                       @RequestParam(defaultValue = "10") int request) {
+        return eventPublicService.getEventRecommendations(userId, request);
+    }
+
+    @PutMapping("/{eventId}/like")
+    public void addLike(@RequestHeader("X-EWM-USER-ID") Long userId, @PathVariable Long eventId) {
+        eventPublicService.addLike(userId, eventId);
+    }
 }

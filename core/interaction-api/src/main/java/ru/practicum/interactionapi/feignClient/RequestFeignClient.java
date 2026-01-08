@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateRequest;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateResult;
 import ru.practicum.interactionapi.dto.request.ParticipationRequestDto;
+import ru.practicum.interactionapi.enums.RequestStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,10 @@ public interface RequestFeignClient {
             @PathVariable Long eventId, Exception throwable) {
         return new ArrayList<>();
     }
+
+    @GetMapping("/{eventId}/{userId}/check-user")
+    public boolean checkByEventIdAndRequesterIdAndStatus(@PathVariable Long eventId,@PathVariable Long userId,
+                                                         @RequestParam RequestStatus status) throws FeignException;
 
 
 }

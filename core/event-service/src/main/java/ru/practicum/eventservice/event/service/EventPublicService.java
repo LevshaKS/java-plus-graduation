@@ -21,14 +21,17 @@ import ru.practicum.interactionapi.dto.stats.ViewStats;
 import ru.practicum.interactionapi.enums.EventState;
 import ru.practicum.eventservice.event.repository.EventRepository;
 import ru.practicum.eventservice.mapper.EventMapper;
+import ru.practicum.interactionapi.enums.RequestStatus;
 import ru.practicum.interactionapi.exception.NotFoundException;
 import ru.practicum.interactionapi.exception.ValidationException;
-import ru.practicum.interactionapi.feignClient.CommentFeignClient;
-import ru.practicum.interactionapi.feignClient.LocationFeignClient;
-import ru.practicum.interactionapi.feignClient.RequestFeignClient;
-import ru.practicum.interactionapi.feignClient.StatsFeignClient;
+import ru.practicum.interactionapi.feignClient.*;
+import ru.practicum.ewm.grpc.stats.event.ActionTypeProto;
+import ru.practicum.ewm.grpc.stats.event.RecommendedEventProto;
+import ru.practicum.ewm.RecommendationsClient;
+import ru.practicum.ewm.CollectorClient;
 
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -47,6 +50,9 @@ public class EventPublicService {
     private final RequestFeignClient requestFeignClient;
     private final CommentFeignClient commentFeignClient;
     private final LocationFeignClient locationFeignClient;
+
+    private final ClientFeignController clientFeignController;
+
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -147,6 +153,33 @@ public class EventPublicService {
         log.info("Событие с ID {} найдено", eventId);
         return eventDto;
     }
+
+
+    public List<EventShortDto> getEventRecommendations(Long userId, int request) {
+        Map<Long, Double> recommendations = clientFeignController.getRecommendationsUser(userId, request)
+                .collect(Collectors.toMap(RecommendedEventProto::getEventId, RecommendedEventProto::getScore));
+
+        List<Event> events = eventRepository.findAllById(recommendations.keySet());
+
+
+        List<EventShortDto> eventDtos = convertToEventShortDtoList(events);
+
+        List<EventShortDto> result = eventDtos.stream()
+                .peek(eventShortDto -> eventShortDto.setRating(recommendations.get(eventShortDto.getId()))).toList();
+        log.info("вывод резуьтата {}", result);
+        return result;
+
+    }
+
+
+    public void addLike(Long userId, Long eventId) {
+        if (!requestFeignClient.checkByEventIdAndRequesterIdAndStatus(eventId, userId, RequestStatus.CONFIRMED.CONFIRMED)) {
+            throw new ValidationException("Пользователь не участвует в  событии");
+        }
+
+        clientFeignController.addLike(eventId, userId);
+    }
+
 
     private List<EventShortDto> convertToEventShortDtoList(List<Event> events) {
         if (events.isEmpty()) {
@@ -281,4 +314,6 @@ public class EventPublicService {
             log.warn("Ошибка при сохранении статистики: {}", e.getMessage());
         }
     }
+
+
 }

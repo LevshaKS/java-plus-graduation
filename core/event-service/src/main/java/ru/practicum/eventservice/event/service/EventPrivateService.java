@@ -86,13 +86,13 @@ public class EventPrivateService {
         }
 
         EventRequestStatusUpdateResult result = requestFeignClient.changeRequestStatus(userId, eventId, dto);
-      if (result.getExceptionStatus()== ExceptionStatus.CONFLICT_EXCEPTION_STATUS) {
-          throw new ConflictException("Статус можно изменить только у заявок в ожидании");
-      } else if (result.getExceptionStatus()== ExceptionStatus.CONFLICT_EXCEPTION_LIMIT) {
-          throw new ConflictException("Достигнут лимит одобренных заявок");
-      } else if (result.getExceptionStatus()== ExceptionStatus.STATS_SERVER_UNAVAILABLE) {
-          throw new IllegalArgumentException("Неверный статус: " + dto.getStatus());
-      } else return  result;
+        if (result.getExceptionStatus() == ExceptionStatus.CONFLICT_EXCEPTION_STATUS) {
+            throw new ConflictException("Статус можно изменить только у заявок в ожидании");
+        } else if (result.getExceptionStatus() == ExceptionStatus.CONFLICT_EXCEPTION_LIMIT) {
+            throw new ConflictException("Достигнут лимит одобренных заявок");
+        } else if (result.getExceptionStatus() == ExceptionStatus.STATS_SERVER_UNAVAILABLE) {
+            throw new IllegalArgumentException("Неверный статус: " + dto.getStatus());
+        } else return result;
 
     }
 
@@ -216,7 +216,7 @@ public class EventPrivateService {
                 .map(event -> mapper.toEventShortDto(event,
                         confirmedRequestsMap.getOrDefault(event.getId(), 0L),
                         0L, // views пока 0
-                        commentsCountMap.getOrDefault(event.getId(), 0L))) // добавляем количество комментариев
+                        commentsCountMap.getOrDefault(event.getId(), 0L), null)) // добавляем количество комментариев
                 .collect(Collectors.toList());
     }
 

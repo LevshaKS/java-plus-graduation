@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateRequest;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateResult;
 import ru.practicum.interactionapi.dto.request.ParticipationRequestDto;
+import ru.practicum.interactionapi.enums.RequestStatus;
 import ru.practicum.requestservice.service.RequestPrivateService;
 
 import java.util.List;
@@ -47,5 +48,11 @@ public class InternalRequestController {
             @Valid @RequestBody EventRequestStatusUpdateRequest dto) {
         log.info("PATCH /users/{}/events/{}/requests", userId, eventId);
         return requestService.changeRequestStatus(userId, eventId, dto);
+    }
+
+    @GetMapping("/{eventId}/{userId}/check-user")
+    public boolean checkByEventIdAndRequesterIdAndStatus(@PathVariable Long eventId, @PathVariable Long userId,
+                                                         @RequestParam RequestStatus status) {
+        return requestService.checkByEventIdAndRequesterIdAndStatus(eventId, userId, status);
     }
 }
