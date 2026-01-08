@@ -57,7 +57,7 @@ public interface RequestFeignClient {
     }
 
     @GetMapping("/{eventId}/{userId}/check-user")
-    public boolean checkByEventIdAndRequesterIdAndStatus(@PathVariable Long eventId,@PathVariable Long userId,
+    boolean checkByEventIdAndRequesterIdAndStatus(@PathVariable Long eventId,@PathVariable Long userId,
                                                          @RequestParam RequestStatus status) throws FeignException;
 
 

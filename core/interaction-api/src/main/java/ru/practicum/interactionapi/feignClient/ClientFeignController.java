@@ -19,5 +19,5 @@ public interface ClientFeignController {
                                                          @RequestParam(defaultValue = "10") @Positive int request) throws FeignException;
 
     @PutMapping("/{userId}/{eventId}/like")
-    public void addLike(@PathVariable Long userId, @PathVariable Long eventId) throws FeignException;
+    void addLike(@PathVariable Long userId, @PathVariable Long eventId) throws FeignException;
 }

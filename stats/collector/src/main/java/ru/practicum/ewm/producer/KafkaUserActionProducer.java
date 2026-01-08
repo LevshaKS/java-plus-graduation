@@ -22,7 +22,7 @@ public class KafkaUserActionProducer implements AutoCloseable {
     public void send(UserActionAvro message, Long eventId, Instant timestamp, String topic) {
         ProducerRecord<Long, UserActionAvro> record = new ProducerRecord<>(topic, null,
                 timestamp.toEpochMilli(), eventId, message);
-        log.info("Отправляем {}", record.toString());
+        log.info("Отправляем {}", record);
         producer.send(record);
         producer.flush();
     }

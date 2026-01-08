@@ -25,13 +25,9 @@ import ru.practicum.interactionapi.enums.RequestStatus;
 import ru.practicum.interactionapi.exception.NotFoundException;
 import ru.practicum.interactionapi.exception.ValidationException;
 import ru.practicum.interactionapi.feignClient.*;
-import ru.practicum.ewm.grpc.stats.event.ActionTypeProto;
 import ru.practicum.ewm.grpc.stats.event.RecommendedEventProto;
-import ru.practicum.ewm.RecommendationsClient;
-import ru.practicum.ewm.CollectorClient;
 
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -173,7 +169,7 @@ public class EventPublicService {
 
 
     public void addLike(Long userId, Long eventId) {
-        if (!requestFeignClient.checkByEventIdAndRequesterIdAndStatus(eventId, userId, RequestStatus.CONFIRMED.CONFIRMED)) {
+        if (!requestFeignClient.checkByEventIdAndRequesterIdAndStatus(eventId, userId, RequestStatus.CONFIRMED)) {
             throw new ValidationException("Пользователь не участвует в  событии");
         }
 
