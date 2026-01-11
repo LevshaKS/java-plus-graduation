@@ -128,7 +128,7 @@ public class EventPublicService {
 
         saveStats(ip, uri);
 
-        log.info("Событие с ID {} найдено для пользователя {}", eventId);
+        log.info("Событие с ID {} найдено для пользователя ", eventId);
 
         clientFeignController.addView(userId, eventId);
 
