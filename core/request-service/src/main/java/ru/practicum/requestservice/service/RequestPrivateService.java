@@ -17,6 +17,7 @@ import ru.practicum.interactionapi.exception.NotFoundException;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateRequest;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateResult;
 import ru.practicum.interactionapi.dto.request.ParticipationRequestDto;
+import ru.practicum.interactionapi.feignClient.ClientFeignController;
 import ru.practicum.interactionapi.feignClient.EventFeignClient;
 import ru.practicum.interactionapi.feignClient.UserFeignClient;
 import ru.practicum.interactionapi.dto.request.ParticipationRequestResponse;
@@ -29,6 +30,8 @@ import ru.practicum.requestservice.repository.ParticipationRequestRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -46,6 +49,9 @@ public class RequestPrivateService {
 
     private final EventFeignClient eventFeignClient;
 
+    private final ClientFeignController collectorClient;
+
+
     public List<ParticipationRequestDto> getUserRequests(Long userId) {
         log.info("Получение запросов пользователя userId={}", userId);
 
@@ -55,10 +61,17 @@ public class RequestPrivateService {
                 .toList();
     }
 
-    public List<Object[]> countConfirmedRequestsByEventIds(List<Long> eventIds) {
+    public Map<Long, Long> countConfirmedRequestsByEventIds(List<Long> eventIds) {
         log.info("Подсчет подтвержденных запросов для списка событий eventIds={}", eventIds);
 
-        return requestRepository.countConfirmedRequestsByEventIds(eventIds);
+        List<Object[]> results = requestRepository.countConfirmedRequestsByEventIds(eventIds);
+
+        return results.stream()
+                .collect(Collectors.toMap(
+                        result -> (Long.parseLong(result[0].toString())),
+                        result -> (Long.parseLong(result[1].toString()))
+                ));
+
     }
 
     public Long countConfirmedRequestsByEventId(Long eventId) {
@@ -110,6 +123,10 @@ public class RequestPrivateService {
                 .build();
 
         ParticipationRequest saved = requestRepository.save(request);
+
+        collectorClient.addRegister(eventId, userId);
+
+
         return mapper.toParticipationRequestDto(saved);
     }
 

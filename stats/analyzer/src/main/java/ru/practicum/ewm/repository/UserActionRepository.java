@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import ru.practicum.ewm.model.UserAction;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface UserActionRepository extends JpaRepository<UserAction, Long> {
@@ -23,5 +24,8 @@ public interface UserActionRepository extends JpaRepository<UserAction, Long> {
     @Query("select COALESCE(SUM(u.calc), 0) from UserAction as u where u.eventId = :eventId")
     Float getSumWeightByEventId(@Param("eventId") Long eventId);
 
+
+    @Query("SELECT u.eventId, COALESCE(SUM(u.calc),0) from UserAction as u where u.eventId in :eventId GROUP BY u.eventId")
+    List<Object[]> getSumWeightByAllEventId(@Param("eventId") List<Long> eventId);
 
 }

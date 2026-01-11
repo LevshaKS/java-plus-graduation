@@ -21,5 +21,4 @@ public interface EventSimilarityRepository extends JpaRepository<EventSimilarity
 
     boolean existsByEventAAndEventB(Long eventA, Long eventB);
 
-
 }

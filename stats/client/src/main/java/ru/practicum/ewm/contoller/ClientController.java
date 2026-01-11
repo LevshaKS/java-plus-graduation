@@ -25,13 +25,27 @@ public class ClientController {
     @GetMapping("/{userId}")
     Stream<RecommendedEventProto> getRecommendationsUser(@PathVariable Long userId,
                                                          @RequestParam(defaultValue = "10") @Positive int request) {
-
+        log.info("GET /{}", userId);
         return recommendationsClient.getRecommendationsUser(userId, request);
     }
 
     @PutMapping("/{userId}/{eventId}/like")
-    public void addLike(@PathVariable Long userId, @PathVariable Long eventId) {
+    void addLike(@PathVariable Long userId, @PathVariable Long eventId) {
+        log.info("PUT /{}/{}/like", userId, eventId);
         collectorClient.collectUserAction(eventId, userId, ActionTypeProto.ACTION_LIKE, Instant.now());
-        ;
     }
+
+    @GetMapping("/{userId}/{eventId}/view")
+    void addView(@PathVariable Long userId, @PathVariable Long eventId) {
+        log.info("GET /{}/{}/view", userId, eventId);
+        collectorClient.collectUserAction(eventId, userId, ActionTypeProto.ACTION_VIEW, Instant.now());
+    }
+
+    @GetMapping("/{userId}/{eventId}/register")
+    void addRegister(@PathVariable Long userId, @PathVariable Long eventId) {
+        log.info("GET /{}/{}/register", userId, eventId);
+        collectorClient.collectUserAction(eventId, userId, ActionTypeProto.ACTION_REGISTER, Instant.now());
+
+    }
+
 }

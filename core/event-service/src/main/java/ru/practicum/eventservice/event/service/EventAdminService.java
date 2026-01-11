@@ -150,6 +150,7 @@ public class EventAdminService {
         Long confirmedRequests = requestFeignClient.countConfirmedRequestsByEventId(event.getId());
         Long commentsCount = commentFeignClient.countByEventId(event.getId());
         LocationDto locationDto = locationFeignClient.getLocation(event.getLocation());
+
         return mapper.toEventFullDto(event, confirmedRequests, 0L, commentsCount, locationDto);
     }
 
@@ -192,13 +193,9 @@ public class EventAdminService {
     }
 
     private Map<Long, Long> getConfirmedRequestsMap(List<Long> eventIds) {
-        List<Object[]> results = requestFeignClient.countConfirmedRequestsByEventIds(eventIds);
-        return results.stream()
-                .collect(Collectors.toMap(
-                        result -> (Long.parseLong(result[0].toString())),
-                        result -> (Long.parseLong(result[1].toString()))
-                ));
+        return requestFeignClient.countConfirmedRequestsByEventIds(eventIds);
     }
+
 
     private Map<Long, Long> getCommentsCountMap(List<Long> eventIds) {
         if (eventIds.isEmpty()) {

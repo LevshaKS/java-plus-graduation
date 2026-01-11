@@ -10,6 +10,7 @@ import ru.practicum.ewm.grpc.stats.event.UserActionProto;
 
 import java.time.Instant;
 
+
 @Service
 public class CollectorClient {
     private final UserActionControllerGrpc.UserActionControllerBlockingStub userActionStub;

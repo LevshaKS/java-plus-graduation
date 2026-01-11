@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @Component
 public class EventMapper {
     // Маппинг событий
+
     public EventFullDto toEventFullDto(Event event, Long confirmedRequests, Long views, Long commentCount, LocationDto locationDto) {
         return new EventFullDto(
                 event.getId(),
@@ -39,7 +40,32 @@ public class EventMapper {
                 event.getState(),
                 event.getTitle(),
                 views,
-                commentCount
+                commentCount,
+                0d
+        );
+    }
+
+
+    public EventFullDto toEventFullDto(Event event, Long confirmedRequests, Long views, Long commentCount, LocationDto locationDto, Double rating) {
+        return new EventFullDto(
+                event.getId(),
+                event.getAnnotation(),
+                toCategoryDto(event.getCategory()),
+                confirmedRequests,
+                event.getCreatedOn(),
+                event.getDescription(),
+                event.getEventDate(),
+                event.getInitiatorId(),
+                locationDto,
+                event.getPaid(),
+                event.getParticipantLimit(),
+                event.getPublishedOn(),
+                event.getRequestModeration(),
+                event.getState(),
+                event.getTitle(),
+                views,
+                commentCount,
+                rating
         );
     }
 
@@ -119,7 +145,8 @@ public class EventMapper {
                 event.getState(),
                 event.getTitle(),
                 0L, // будет установлено в сервисе (views)
-                0L  // будет установлено в сервисе (commentsCount)
+                0L,  // будет установлено в сервисе (commentsCount)
+                0d
         );
     }
 

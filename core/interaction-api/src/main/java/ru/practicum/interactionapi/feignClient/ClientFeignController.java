@@ -11,7 +11,7 @@ import ru.practicum.ewm.grpc.stats.event.RecommendedEventProto;
 
 import java.util.stream.Stream;
 
-@FeignClient(name = "client", path = "/internal/clients")
+@FeignClient(name = "client-controller", path = "/internal/clients")
 public interface ClientFeignController {
 
     @GetMapping("/{userId}")
@@ -20,4 +20,13 @@ public interface ClientFeignController {
 
     @PutMapping("/{userId}/{eventId}/like")
     void addLike(@PathVariable Long userId, @PathVariable Long eventId) throws FeignException;
+
+    @GetMapping("/{userId}/{eventId}/view")
+    void addView(@PathVariable Long userId, @PathVariable Long eventId) throws FeignException;
+
+
+    @GetMapping("/{userId}/{eventId}/register")
+    void addRegister(@PathVariable Long userId, @PathVariable Long eventId) throws FeignException;
+
+
 }

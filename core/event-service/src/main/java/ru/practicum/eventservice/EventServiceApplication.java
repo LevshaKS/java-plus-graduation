@@ -8,6 +8,7 @@ import ru.practicum.interactionapi.feignClient.*;
 
 @EnableDiscoveryClient
 @SpringBootApplication
+
 @EnableFeignClients(clients = {ClientFeignController.class, UserFeignClient.class, CommentFeignClient.class, StatsFeignClient.class, LocationFeignClient.class, RequestFeignClient.class})
 public class EventServiceApplication {
 

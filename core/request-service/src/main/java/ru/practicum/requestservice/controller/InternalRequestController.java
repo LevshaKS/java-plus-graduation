@@ -12,6 +12,7 @@ import ru.practicum.interactionapi.enums.RequestStatus;
 import ru.practicum.requestservice.service.RequestPrivateService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/internal/requests")
@@ -27,7 +28,7 @@ public class InternalRequestController {
     }
 
     @GetMapping("/request/{eventIds}")
-    public List<Object[]> countConfirmedRequestsByEventIds(@PathVariable List<Long> eventIds) {
+    public Map<Long, Long> countConfirmedRequestsByEventIds(@PathVariable List<Long> eventIds) {
         log.info("GET {}", eventIds);
         return requestService.countConfirmedRequestsByEventIds(eventIds);
     }
