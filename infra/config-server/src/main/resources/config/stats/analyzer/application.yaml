@@ -1,0 +1,57 @@
+# порт сервиса
+grpc:
+  server:
+    port: 0
+
+# Database configuration
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show_sql: false
+
+  sql:
+    init:
+      mode: always
+
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6543/analyzer
+    username: postgres
+    password: postgres
+
+
+  kafka:
+    bootstrap-servers: "localhost:9092"
+    consumer-poll-timeout: 1000ms
+
+    consumers_u:
+      properties:
+        "bootstrap.servers": ${spring.kafka.bootstrap-servers}
+        "value.deserializer": "ru.practicum.ewm.deserializer.UserActionAvroDeserializer"
+        "group.id": "userActionGroup"
+        "key.deserializer": "org.apache.kafka.common.serialization.LongDeserializer"
+        "enable.auto.commit": false
+      topics: "stats.user-actions.v1"
+
+    consumers_e:
+      properties:
+        "bootstrap.servers": ${spring.kafka.bootstrap-servers}
+        "value.deserializer": "ru.practicum.ewm.deserializer.EventSimilarityAvroDeserializer"
+        "group.id": "similarityGroup"
+        "key.deserializer": "org.apache.kafka.common.serialization.LongDeserializer"
+        "enable.auto.commit": false
+      topics: "stats.events-similarity.v1"
+
+
+
+application:
+  action-weight:
+    view: 0.4
+    register: 0.8
+    like: 1.0
+

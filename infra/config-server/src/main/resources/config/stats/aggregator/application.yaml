@@ -1,0 +1,36 @@
+grpc:
+  server:
+    port: 0
+
+
+spring:
+  kafka:
+    bootstrap-servers: "localhost:9092"
+    consumer-poll-timeout: 1000ms
+
+
+    producers:
+      properties:
+        "bootstrap.servers": ${spring.kafka.bootstrap-servers}
+        "value.serializer": "ru.practicum.ewm.serializer.GeneralAvroSerializer"
+        "key.serializer": "org.apache.kafka.common.serialization.LongSerializer"
+      topics: "stats.events-similarity.v1"
+
+
+
+    consumers:
+      properties:
+        "bootstrap.servers": ${spring.kafka.bootstrap-servers}
+        "value.deserializer": "ru.practicum.ewm.deserializer.UserActionAvroDeserializer"
+        "group.id": "userAction.group.id"
+        "key.deserializer": "org.apache.kafka.common.serialization.LongDeserializer"
+        "enable.auto.commit": false
+      topics: "stats.user-actions.v1"
+
+
+
+application:
+  action-weight:
+    view: 0.4
+    register: 0.8
+    like: 1.0

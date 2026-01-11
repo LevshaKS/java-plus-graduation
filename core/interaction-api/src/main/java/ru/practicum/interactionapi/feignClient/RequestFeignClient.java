@@ -8,9 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateRequest;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateResult;
 import ru.practicum.interactionapi.dto.request.ParticipationRequestDto;
+import ru.practicum.interactionapi.enums.RequestStatus;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @FeignClient(name = "request-service", path = "/internal/requests")
 public interface RequestFeignClient {
@@ -21,7 +24,7 @@ public interface RequestFeignClient {
 
     @CircuitBreaker(name = "defaultBreaker", fallbackMethod = "countConfirmedRequestsByEventIdsFallback")
     @GetMapping("/request/{eventIds}")
-    List<Object[]> countConfirmedRequestsByEventIds(@PathVariable List<Long> eventIds) throws FeignException;
+    Map<Long, Long> countConfirmedRequestsByEventIds(@PathVariable List<Long> eventIds) throws FeignException;
 
     @CircuitBreaker(name = "defaultBreaker", fallbackMethod = "getEventParticipantsFallback")
     @GetMapping("/{userId}/{eventId}/requests")
@@ -43,8 +46,8 @@ public interface RequestFeignClient {
 
 
     @GetMapping("/request/{eventIds}")
-    default List<Object[]> countConfirmedRequestsByEventIdsFallback(@PathVariable List<Long> eventIds, Exception throwable) {
-        return new ArrayList<>();
+    default Map<Long, Long> countConfirmedRequestsByEventIdsFallback(@PathVariable List<Long> eventIds, Exception throwable) {
+        return new HashMap<>();
     }
 
 
@@ -54,6 +57,10 @@ public interface RequestFeignClient {
             @PathVariable Long eventId, Exception throwable) {
         return new ArrayList<>();
     }
+
+    @GetMapping("/{eventId}/{userId}/check-user")
+    boolean checkByEventIdAndRequesterIdAndStatus(@PathVariable Long eventId, @PathVariable Long userId,
+                                                  @RequestParam RequestStatus status) throws FeignException;
 
 
 }

@@ -26,10 +26,7 @@ import ru.practicum.interactionapi.enums.ExceptionStatus;
 import ru.practicum.interactionapi.exception.ConflictException;
 import ru.practicum.interactionapi.exception.NotFoundException;
 import ru.practicum.interactionapi.exception.ValidationException;
-import ru.practicum.interactionapi.feignClient.CommentFeignClient;
-import ru.practicum.interactionapi.feignClient.LocationFeignClient;
-import ru.practicum.interactionapi.feignClient.RequestFeignClient;
-import ru.practicum.interactionapi.feignClient.UserFeignClient;
+import ru.practicum.interactionapi.feignClient.*;
 
 
 import java.time.LocalDateTime;
@@ -86,13 +83,13 @@ public class EventPrivateService {
         }
 
         EventRequestStatusUpdateResult result = requestFeignClient.changeRequestStatus(userId, eventId, dto);
-      if (result.getExceptionStatus()== ExceptionStatus.CONFLICT_EXCEPTION_STATUS) {
-          throw new ConflictException("Статус можно изменить только у заявок в ожидании");
-      } else if (result.getExceptionStatus()== ExceptionStatus.CONFLICT_EXCEPTION_LIMIT) {
-          throw new ConflictException("Достигнут лимит одобренных заявок");
-      } else if (result.getExceptionStatus()== ExceptionStatus.STATS_SERVER_UNAVAILABLE) {
-          throw new IllegalArgumentException("Неверный статус: " + dto.getStatus());
-      } else return  result;
+        if (result.getExceptionStatus() == ExceptionStatus.CONFLICT_EXCEPTION_STATUS) {
+            throw new ConflictException("Статус можно изменить только у заявок в ожидании");
+        } else if (result.getExceptionStatus() == ExceptionStatus.CONFLICT_EXCEPTION_LIMIT) {
+            throw new ConflictException("Достигнут лимит одобренных заявок");
+        } else if (result.getExceptionStatus() == ExceptionStatus.STATS_SERVER_UNAVAILABLE) {
+            throw new IllegalArgumentException("Неверный статус: " + dto.getStatus());
+        } else return result;
 
     }
 
@@ -128,7 +125,7 @@ public class EventPrivateService {
 
         Long confirmedRequests = requestFeignClient.countConfirmedRequestsByEventId(saved.getId());
 
-        return mapper.toEventFullDto(saved, confirmedRequests, 0L, 0L, locationDto); // views = 0, comments = 0 для нового события
+        return mapper.toEventFullDto(saved, confirmedRequests, 0L, 0L, locationDto); // views = 0, comments = 0
     }
 
     @Transactional
@@ -170,7 +167,7 @@ public class EventPrivateService {
         Long confirmedRequests = requestFeignClient.countConfirmedRequestsByEventId(updated.getId());
         Long commentsCount = commentFeignClient.countByEventId(updated.getId());
         LocationDto locationDto = locationFeignClient.getLocation(updated.getLocation());
-        return mapper.toEventFullDto(updated, confirmedRequests, 0L, commentsCount, locationDto); // views 0
+        return mapper.toEventFullDto(updated, confirmedRequests, 0L, commentsCount, locationDto); //  views 0
     }
 
     public List<EventShortDto> getUserEvents(Long userId, int from, int size) {
@@ -199,7 +196,7 @@ public class EventPrivateService {
         Long confirmedRequests = requestFeignClient.countConfirmedRequestsByEventId(eventId);
         Long commentsCount = commentFeignClient.countByEventId(eventId);
         LocationDto locationDto = locationFeignClient.getLocation(event.getLocation());
-        return mapper.toEventFullDto(event, confirmedRequests, 0L, commentsCount, locationDto); // views 0
+        return mapper.toEventFullDto(event, confirmedRequests, 0L, commentsCount, locationDto); // , views 0
     }
 
     // вспомогательный метод для конвертации списка
@@ -216,18 +213,14 @@ public class EventPrivateService {
                 .map(event -> mapper.toEventShortDto(event,
                         confirmedRequestsMap.getOrDefault(event.getId(), 0L),
                         0L, // views пока 0
-                        commentsCountMap.getOrDefault(event.getId(), 0L))) // добавляем количество комментариев
+                        commentsCountMap.getOrDefault(event.getId(), 0L), null)) // добавляем количество комментариев
                 .collect(Collectors.toList());
     }
 
     // метод для получения подтвержденных запросов
     private Map<Long, Long> getConfirmedRequestsMap(List<Long> eventIds) {
-        List<Object[]> results = requestFeignClient.countConfirmedRequestsByEventIds(eventIds);
-        return results.stream()
-                .collect(Collectors.toMap(
-                        result -> (Long.parseLong(result[0].toString())),
-                        result -> (Long.parseLong(result[1].toString()))
-                ));
+
+        return requestFeignClient.countConfirmedRequestsByEventIds(eventIds);
 
     }
 

@@ -21,12 +21,10 @@ import ru.practicum.interactionapi.dto.stats.ViewStats;
 import ru.practicum.interactionapi.enums.EventState;
 import ru.practicum.eventservice.event.repository.EventRepository;
 import ru.practicum.eventservice.mapper.EventMapper;
+import ru.practicum.interactionapi.enums.RequestStatus;
 import ru.practicum.interactionapi.exception.NotFoundException;
 import ru.practicum.interactionapi.exception.ValidationException;
-import ru.practicum.interactionapi.feignClient.CommentFeignClient;
-import ru.practicum.interactionapi.feignClient.LocationFeignClient;
-import ru.practicum.interactionapi.feignClient.RequestFeignClient;
-import ru.practicum.interactionapi.feignClient.StatsFeignClient;
+import ru.practicum.interactionapi.feignClient.*;
 
 
 import java.time.LocalDateTime;
@@ -47,6 +45,8 @@ public class EventPublicService {
     private final RequestFeignClient requestFeignClient;
     private final CommentFeignClient commentFeignClient;
     private final LocationFeignClient locationFeignClient;
+    private final ClientFeignController clientFeignController;
+
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -117,7 +117,7 @@ public class EventPublicService {
         return eventDtos;
     }
 
-    public EventFullDto getEventById(Long eventId, String ip, String uri) {
+    public EventFullDto getEventById(Long userId, Long eventId, String ip, String uri) {
         log.info("Получение события по ID: {}", eventId);
 
         Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
@@ -128,7 +128,16 @@ public class EventPublicService {
 
         saveStats(ip, uri);
 
-        log.info("Событие с ID {} найдено", eventId);
+        log.info("Событие с ID {} найдено для пользователя ", eventId);
+
+
+        try {
+            clientFeignController.addView(userId, eventId);
+        } catch (FeignException e) {
+            log.warn("Ошибка при отправки просмотра : {}", e.getMessage());
+        }
+
+
         return eventDto;
     }
 
@@ -147,6 +156,35 @@ public class EventPublicService {
         log.info("Событие с ID {} найдено", eventId);
         return eventDto;
     }
+
+
+    public List<EventShortDto> getEventRecommendations(Long userId, int request) {
+        Map<Long, Double> recommendations = new HashMap<>();
+        List<Event> events = eventRepository.findAllById(recommendations.keySet());
+
+
+        List<EventShortDto> eventDtos = convertToEventShortDtoList(events);
+
+        List<EventShortDto> result = eventDtos.stream()
+                .peek(eventShortDto -> eventShortDto.setRating(recommendations.get(eventShortDto.getId()))).toList();
+        log.info("вывод резуьтата {}", result);
+        return result;
+
+    }
+
+
+    public void addLike(Long userId, Long eventId) {
+        if (!requestFeignClient.checkByEventIdAndRequesterIdAndStatus(eventId, userId, RequestStatus.CONFIRMED)) {
+            throw new ValidationException("Пользователь не участвует в  событии");
+        }
+
+        try {
+            clientFeignController.addLike(userId, eventId);
+        } catch (FeignException e) {
+            log.warn("Ошибка при отправки лайка : {}", e.getMessage());
+        }
+    }
+
 
     private List<EventShortDto> convertToEventShortDtoList(List<Event> events) {
         if (events.isEmpty()) {
@@ -177,6 +215,7 @@ public class EventPublicService {
                 .collect(Collectors.toList());
     }
 
+
     private EventFullDto convertToEventFullDto(Event event) {
         LocationDto locationDto = locationFeignClient.getLocation(event.getLocation());
         EventFullDto dto = mapper.toEventFullDto(event, locationDto);
@@ -195,6 +234,7 @@ public class EventPublicService {
 
         return dto;
     }
+
 
     private Map<Long, Long> getViewsMap(List<Long> eventIds) {
         try {
@@ -233,12 +273,7 @@ public class EventPublicService {
             return Map.of();
         }
 
-        return requestFeignClient.countConfirmedRequestsByEventIds(eventIds)
-                .stream()
-                .collect(Collectors.toMap(
-                        result -> (Long.parseLong(result[0].toString())),
-                        result -> (Long.parseLong(result[1].toString()))
-                ));
+        return requestFeignClient.countConfirmedRequestsByEventIds(eventIds);
 
     }
 
@@ -281,4 +316,6 @@ public class EventPublicService {
             log.warn("Ошибка при сохранении статистики: {}", e.getMessage());
         }
     }
+
+
 }

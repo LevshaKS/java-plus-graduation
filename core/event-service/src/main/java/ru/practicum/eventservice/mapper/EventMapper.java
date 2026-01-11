@@ -1,6 +1,7 @@
 package ru.practicum.eventservice.mapper;
 
 import org.springframework.stereotype.Component;
+
 import ru.practicum.interactionapi.dto.event.CategoryDto;
 import ru.practicum.eventservice.category.dto.NewCategoryDto;
 import ru.practicum.eventservice.category.model.Category;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @Component
 public class EventMapper {
     // Маппинг событий
+
     public EventFullDto toEventFullDto(Event event, Long confirmedRequests, Long views, Long commentCount, LocationDto locationDto) {
         return new EventFullDto(
                 event.getId(),
@@ -38,11 +40,37 @@ public class EventMapper {
                 event.getState(),
                 event.getTitle(),
                 views,
-                commentCount
+                commentCount,
+                0d
         );
     }
 
-    public EventShortDto toEventShortDto(Event event, Long confirmedRequests, Long views, Long commentCount) {
+
+    public EventFullDto toEventFullDto(Event event, Long confirmedRequests, Long views, Long commentCount, LocationDto locationDto, Double rating) {
+        return new EventFullDto(
+                event.getId(),
+                event.getAnnotation(),
+                toCategoryDto(event.getCategory()),
+                confirmedRequests,
+                event.getCreatedOn(),
+                event.getDescription(),
+                event.getEventDate(),
+                event.getInitiatorId(),
+                locationDto,
+                event.getPaid(),
+                event.getParticipantLimit(),
+                event.getPublishedOn(),
+                event.getRequestModeration(),
+                event.getState(),
+                event.getTitle(),
+                views,
+                commentCount,
+                rating
+        );
+    }
+
+
+    public EventShortDto toEventShortDto(Event event, Long confirmedRequests, Long views, Long commentCount, Double rating) {
         return new EventShortDto(
                 event.getId(),
                 event.getAnnotation(),
@@ -54,7 +82,8 @@ public class EventMapper {
                 event.getTitle(),
                 views,
                 event.getParticipantLimit(),
-                commentCount
+                commentCount,
+                rating
         );
     }
 
@@ -69,7 +98,7 @@ public class EventMapper {
     public CompilationDto toCompilationDto(Compilation compilation) {
         List<EventShortDto> eventDtos = compilation.getEvents() != null ?
                 compilation.getEvents().stream()
-                        .map(event -> toEventShortDto(event, 0L, 0L, 0L))
+                        .map(event -> toEventShortDto(event, 0L, 0L, 0L, 0.0))
                         .collect(Collectors.toList()) :
                 List.of();
 
@@ -93,7 +122,8 @@ public class EventMapper {
                 event.getTitle(),
                 0L, // будет установлено в сервисе
                 event.getParticipantLimit(),
-                0L // будет установлено в сервисе
+                0L, // будет установлено в сервисе
+                0.0 // будет установлено в сервисе
         );
     }
 
@@ -115,7 +145,8 @@ public class EventMapper {
                 event.getState(),
                 event.getTitle(),
                 0L, // будет установлено в сервисе (views)
-                0L  // будет установлено в сервисе (commentsCount)
+                0L,  // будет установлено в сервисе (commentsCount)
+                0d
         );
     }
 

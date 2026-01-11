@@ -1,5 +1,6 @@
 package ru.practicum.requestservice.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,18 +18,21 @@ import ru.practicum.interactionapi.exception.NotFoundException;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateRequest;
 import ru.practicum.interactionapi.dto.event.EventRequestStatusUpdateResult;
 import ru.practicum.interactionapi.dto.request.ParticipationRequestDto;
+import ru.practicum.interactionapi.feignClient.ClientFeignController;
 import ru.practicum.interactionapi.feignClient.EventFeignClient;
 import ru.practicum.interactionapi.feignClient.UserFeignClient;
 import ru.practicum.interactionapi.dto.request.ParticipationRequestResponse;
 import ru.practicum.requestservice.mapper.RequestMapper;
 import ru.practicum.requestservice.model.ParticipationRequest;
-import ru.practicum.requestservice.model.RequestStatus;
+import ru.practicum.interactionapi.enums.RequestStatus;
 import ru.practicum.requestservice.repository.ParticipationRequestRepository;
 
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -46,6 +50,9 @@ public class RequestPrivateService {
 
     private final EventFeignClient eventFeignClient;
 
+    private final ClientFeignController collectorClient;
+
+
     public List<ParticipationRequestDto> getUserRequests(Long userId) {
         log.info("Получение запросов пользователя userId={}", userId);
 
@@ -55,10 +62,17 @@ public class RequestPrivateService {
                 .toList();
     }
 
-    public List<Object[]> countConfirmedRequestsByEventIds(List<Long> eventIds) {
+    public Map<Long, Long> countConfirmedRequestsByEventIds(List<Long> eventIds) {
         log.info("Подсчет подтвержденных запросов для списка событий eventIds={}", eventIds);
 
-        return requestRepository.countConfirmedRequestsByEventIds(eventIds);
+        List<Object[]> results = requestRepository.countConfirmedRequestsByEventIds(eventIds);
+
+        return results.stream()
+                .collect(Collectors.toMap(
+                        result -> (Long.parseLong(result[0].toString())),
+                        result -> (Long.parseLong(result[1].toString()))
+                ));
+
     }
 
     public Long countConfirmedRequestsByEventId(Long eventId) {
@@ -110,6 +124,13 @@ public class RequestPrivateService {
                 .build();
 
         ParticipationRequest saved = requestRepository.save(request);
+
+        try {
+            collectorClient.addRegister(eventId, userId);
+        } catch (FeignException e) {
+            log.warn("Ошибка при отправки регистрации : {}", e.getMessage());
+        }
+
         return mapper.toParticipationRequestDto(saved);
     }
 
@@ -146,8 +167,10 @@ public class RequestPrivateService {
                 .stream()
                 .map(mapper::toParticipationRequestDto)
                 .toList();
+    }
 
-
+    public boolean checkByEventIdAndRequesterIdAndStatus(Long eventId, Long userId, RequestStatus status) {
+        return requestRepository.findByEventIdAndRequesterIdAndStatus(eventId, userId, status);
     }
 
     @Transactional
