@@ -1,5 +1,6 @@
 package ru.practicum.requestservice.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -124,8 +125,11 @@ public class RequestPrivateService {
 
         ParticipationRequest saved = requestRepository.save(request);
 
-        collectorClient.addRegister(eventId, userId);
-
+        try {
+            collectorClient.addRegister(eventId, userId);
+        } catch (FeignException e) {
+            log.warn("Ошибка при отправки регистрации : {}", e.getMessage());
+        }
 
         return mapper.toParticipationRequestDto(saved);
     }

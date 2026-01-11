@@ -130,7 +130,12 @@ public class EventPublicService {
 
         log.info("Событие с ID {} найдено для пользователя ", eventId);
 
-        clientFeignController.addView(userId, eventId);
+
+        try {
+            clientFeignController.addView(userId, eventId);
+        } catch (FeignException e) {
+            log.warn("Ошибка при отправки просмотра : {}", e.getMessage());
+        }
 
 
         return eventDto;
@@ -173,7 +178,11 @@ public class EventPublicService {
             throw new ValidationException("Пользователь не участвует в  событии");
         }
 
-        clientFeignController.addLike(userId, eventId);
+        try {
+            clientFeignController.addLike(userId, eventId);
+        } catch (FeignException e) {
+            log.warn("Ошибка при отправки лайка : {}", e.getMessage());
+        }
     }
 
 
@@ -264,7 +273,7 @@ public class EventPublicService {
             return Map.of();
         }
 
-        return requestFeignClient.countConfirmedRequestsByEventIds(eventIds);//.stream()
+        return requestFeignClient.countConfirmedRequestsByEventIds(eventIds);
 
     }
 

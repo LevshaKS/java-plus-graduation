@@ -1,6 +1,7 @@
 package ru.practicum.interactionapi.feignClient;
 
 import feign.FeignException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.constraints.Positive;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,15 +19,14 @@ public interface ClientFeignController {
     Stream<RecommendedEventProto> getRecommendationsUser(@PathVariable Long userId,
                                                          @RequestParam(defaultValue = "10") @Positive int request) throws FeignException;
 
+
     @PutMapping("/{userId}/{eventId}/like")
     void addLike(@PathVariable Long userId, @PathVariable Long eventId) throws FeignException;
 
     @GetMapping("/{userId}/{eventId}/view")
     void addView(@PathVariable Long userId, @PathVariable Long eventId) throws FeignException;
 
-
     @GetMapping("/{userId}/{eventId}/register")
     void addRegister(@PathVariable Long userId, @PathVariable Long eventId) throws FeignException;
-
 
 }
